@@ -16,7 +16,7 @@ from bidi.algorithm import get_display
 # CONFIGURATION
 # =========================
 # Assuming your directory structure remains the same
-from src.generators.generator_config import GENERATOR_CONFIG
+from src.config import  GENERATOR_CONFIG
 
 GLOBAL_CONFIG = GENERATOR_CONFIG["GLOBAL"]
 CONFIG = GENERATOR_CONFIG["DUAL_LANG"]
@@ -208,6 +208,7 @@ class DualLanguageGenerator:
         draw = ImageDraw.Draw(img)
         
         # --- Handle English Font ---
+        
         eng_font_path = random.choice(self.eng_fonts)
         eng_size = CONFIG["ENG_BASE_SIZE"]
         eng_font = ImageFont.truetype(eng_font_path, eng_size)
@@ -220,7 +221,15 @@ class DualLanguageGenerator:
         eng_w, eng_h = eng_bbox[2]-eng_bbox[0], eng_bbox[3]-eng_bbox[1]
 
         # --- Handle Arabic Font ---
-        ara_font_path = random.choice(self.ara_fonts)
+        available_ara_fonts=self.ara_fonts
+        if "ء" in ara_label:
+            excluded_fonts = {"a-bad-khat.ttf", "ghalam-1.ttf","b-shekari.ttf"}
+            available_ara_fonts = [
+                f for f in self.ara_fonts 
+                if os.path.basename(f) not in excluded_fonts
+            ]
+
+        ara_font_path = random.choice(available_ara_fonts)
         ara_size = CONFIG["ARA_BASE_SIZE"]
         ara_font = ImageFont.truetype(ara_font_path, ara_size)
         

@@ -2,6 +2,7 @@ import os
 import csv
 import random
 import math
+
 import numpy as np
 import cv2
 from glob import glob
@@ -10,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 # --- IMPORTS FOR ARABIC TEXT ---
 import arabic_reshaper
 from bidi.algorithm import get_display
-from src.generators.generator_config import  GENERATOR_CONFIG
+from src.config import  GENERATOR_CONFIG
 
 
 GLOBAL_CONFIG=GENERATOR_CONFIG["GLOBAL"]
@@ -44,6 +45,12 @@ class ArabicPrescriptionGenerator:
 
     def _fix_arabic(self, text):
         """Reshapes letters (Connects them) and Reverses direction (RTL)."""
+        configuration = {
+        'delete_harakat': False,  # Keep diacritics
+        'support_ligatures': True,
+        'RIAL SIGN': False,
+    }
+
         reshaped_text = arabic_reshaper.reshape(text) 
         bidi_text = get_display(reshaped_text)        
         return bidi_text
@@ -112,9 +119,19 @@ class ArabicPrescriptionGenerator:
         W, H = CONFIG["FINAL_SIZE"][0] + pad_w, CONFIG["FINAL_SIZE"][1] + pad_h
         bg_color = random.choice([(255, 255, 255), (252, 252, 250), (250, 250, 245)])
         text_color = random.choice(GLOBAL_CONFIG["TEXT_COLORS"])
+
+        available_fonts = self.fonts
+        
+        if "ء" in raw_label:
+            excluded_fonts = {"a-bad-khat.ttf", "ghalam-1.ttf","b-shekari.ttf"}
+            available_fonts = [
+                f for f in self.fonts 
+                if os.path.basename(f) not in excluded_fonts
+            ]
+        
         
         # Select Font
-        font_path = random.choice(self.fonts)
+        font_path = random.choice(available_fonts)
         font_name = os.path.basename(font_path)
         
         # 4. Fit Font Size

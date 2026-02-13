@@ -7,7 +7,7 @@ import numpy as np
 import cv2
 from glob import glob
 from PIL import Image, ImageDraw, ImageFont
-from src.generators.generator_config import  GENERATOR_CONFIG
+from src.config import  GENERATOR_CONFIG
 # =========================
 # CONFIGURATION
 # =========================
